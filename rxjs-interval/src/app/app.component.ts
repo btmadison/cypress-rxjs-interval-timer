@@ -1,10 +1,21 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { interval, timer } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { PollingService } from './polling.service';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  template: `ppl:
+  <ul>
+    <li *ngFor="let p of ppl">{{p.firstName}} {{p.lastName}}: {{p.email}}</li>
+  </ul>`
 })
-export class AppComponent {
-  title = 'cypress-rxjs-interval-timer';
+export class AppComponent implements OnInit {
+  ppl = [];
+  constructor(private poll: PollingService) {}
+  ngOnInit() {
+    timer(0, 30000).pipe(
+      tap((x) => this.ppl = this.poll.getSomeData(x+1))
+    ).subscribe();
+  }
 }
